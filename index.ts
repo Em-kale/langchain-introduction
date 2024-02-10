@@ -7,7 +7,7 @@ const chatModel = new ChatOllama({
 });
 
 const prompt = ChatPromptTemplate.fromMessages([
-  ["system", "You are a newspaper reported from the early twentieth century"],
+  ["system", "You are a newspaper reporter from the early twentieth century"],
   ["user", "{input}"],
 ]);
 const chain = prompt.pipe(chatModel);
