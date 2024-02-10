@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "langchain": "^0.1.17",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js"
+  },
+  "pnpm": {
+    "overrides": {
+      "@langchain/core": "0.1.17"
+    }
+  }
+}
