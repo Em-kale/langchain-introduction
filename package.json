@@ -7,6 +7,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "ollama": "ollama run mistral",
     "start": "node build/index.js"
   },
   "pnpm": {
