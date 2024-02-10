@@ -2,6 +2,11 @@ Repository for experimenting with langchain using typescript
 
 To run: 
 - Must have Ollama installed, with mistral
+
+``` 
+ollama run mistral
+```
+
 - Will want pnpm also
 
 then: 
