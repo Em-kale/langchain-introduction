@@ -4,12 +4,16 @@
     "@langchain/core": "0.1.17",
     "cheerio": "1.0.0-rc.12",
     "closevector-node": "^0.1.6",
+    "faiss-node": "^0.5.1",
+    "hnswlib-node": "^2.1.0",
     "langchain": "^0.1.17",
+    "pickleparser": "^0.2.1",
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json",
     "ollama": "ollama run mistral",
+    "generate": "node build/generateVectorStore.js",
     "start": "node build/index.js"
   },
   "pnpm": {
