@@ -1,48 +1,11 @@
 import { ChatOllama } from "@langchain/community/chat_models/ollama";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
-import { StringOutputParser } from "@langchain/core/output_parsers";
-import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
-import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
-
 import { createStuffDocumentsChain } from "langchain/chains/combine_documents";
 import { createRetrievalChain } from "langchain/chains/retrieval";
-
-//in memory vector store that works in a node environment
-import { CloseVectorNode } from "@langchain/community/vectorstores/closevector/node";
+import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
+import { FaissStore } from "@langchain/community/vectorstores/faiss";
 
 console.log("starting the program");
-console.log("loading the documents from the vitalpoint.ai website...");
-
-const loader = new CheerioWebBaseLoader(
-  //load in information about langchain
-  "https://vitalpoint.ai/"
-);
-const docs = await loader.load();
-
-console.log("finished loading the documents from the vitalpoint.ai website");
-
-//split the text into more manageable chunks
-console.log("splitting the documents into smaller chunks...");
-const splitter = new RecursiveCharacterTextSplitter();
-const splitDocs = await splitter.splitDocuments(docs);
-
-console.log("creating the embeddings...");
-const embeddings = new OllamaEmbeddings({
-  model: "mistral",
-});
-console.log("embeddings created");
-
-console.log("creating the vector store...");
-
-//this will take our embeddings model, which uses mixtral embeddings, and apply that to the splitDocs, generating
-//the relationships of the tokens in vector space
-const vectorstore = await CloseVectorNode.fromDocuments(
-  splitDocs,
-  new OllamaEmbeddings()
-);
-
-console.log("vector store created");
 
 console.log("initializing the chat model...");
 //this is the chat model that we will use to generate the responses
@@ -60,7 +23,19 @@ const prompt = ChatPromptTemplate.fromMessages([
   ["user", "{input}"],
 ]);
 
-async function doPrompt() {
+async function loadVectorStore(): Promise<FaissStore> {
+  console.log("loading the vector store...");
+  const vectorStore = await FaissStore.load(
+    "./vector_store/",
+    new OllamaEmbeddings({ model: "mistral" })
+  );
+  console.log("finished loading the vector store.");
+  return vectorStore;
+}
+
+async function doPrompt(){
+  const loadedVectorStore = await loadVectorStore();
+
   console.log("`creating document chain...");
 
   const documentChain = await createStuffDocumentsChain({
@@ -71,7 +46,7 @@ async function doPrompt() {
   console.log("creating retriever...");
   //wraps the vector store so it conforms to the retriever interface
   //it in turn will use vector store methods to query the data , but lets you treat all retrievers the same
-  const retriever = vectorstore.asRetriever();
+  const retriever = loadedVectorStore.asRetriever();
 
   console.log("creating retrieval chain...");
   //this should just handle adding the context to the input but I'm not confident how - need to investigate
