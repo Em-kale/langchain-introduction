@@ -31,7 +31,7 @@ async function generateVectorStore(): Promise<void> {
   );
 
   // Save the vector store to a directory
-  const directory = "./vector_store/";
+  const directory = "/vector_store";
   await vectorStore.save(directory);
 }
 
